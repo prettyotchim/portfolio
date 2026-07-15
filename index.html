@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Premium Video Editing</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           BASE & DESIGN TOKENS
+        ============================================================ */
+        :root {
+            /* Core palette */
+            --bg-color: #080706;
+            --text-main: #f5f0ea;
+            --text-muted: #7a7268;
+            --text-warm: #b8a98a;
+
+            /* Gold accent system */
+            --gold-light: #d4a96a;
+            --gold-mid: #b8882d;
+            --gold-dark: #8a6420;
+            --gold-glow: rgba(180, 140, 60, 0.15);
+
+            /* Glass system */
+            --glass-bg: rgba(255, 248, 235, 0.03);
+            --glass-border: rgba(212, 169, 106, 0.12);
+
+            /* Fonts */
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+
+            /* Transitions */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ============================================================
+           GLOBAL RESET & BASE
+        ============================================================ */
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        h1,
+        h2,
+        h3,
+        .number {
+            font-family: var(--font-heading);
+            margin: 0;
+            font-weight: 800;
+        }
+
+        /* ============================================================
+           SHARED COMPONENTS
+        ============================================================ */
+
+        /* Gold gradient text */
+        .text-gradient {
+            background: linear-gradient(135deg, #f5edd8 0%, var(--gold-light) 45%, #f5edd8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Eyebrow label above headings */
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 20px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: var(--gold-light);
+            opacity: 0.7;
+        }
+
+        /* Reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.22s;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 0.34s;
+        }
+
+        /* Video Audio Controls (global) */
+        .video-controls {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+            background: rgba(8, 7, 6, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 169, 106, 0.2);
+            border-radius: 100px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.35s var(--ease-out-expo);
+            z-index: 10;
+        }
+
+        .video-item:hover .video-controls,
+        .unreleased-item:hover .video-controls {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mute-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-light);
+            outline: none;
+        }
+
+        .mute-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .mute-btn:hover svg {
+            transform: scale(1.15);
+        }
+
+        .volume-slider {
+            width: 0;
+            opacity: 0;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            -webkit-appearance: none;
+            background: transparent;
+            margin: 0;
+        }
+
+        .video-controls:hover .volume-slider {
+            width: 60px;
+            opacity: 1;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 11px;
+            width: 11px;
+            border-radius: 50%;
+            background: var(--gold-light);
+            cursor: pointer;
+            margin-top: -4px;
+        }
+
+        .volume-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 3px;
+            cursor: pointer;
+            background: rgba(212, 169, 106, 0.25);
+            border-radius: 2px;
+        }
+
+        .volume-slider:focus {
+            outline: none;
+        }
+
+        /* ============================================================
+           BLOCK 1 — RECORDS
+           Dark, near-black. Champagne gold digits. Authority & power.
+        ============================================================ */
+        .stats-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 80px 0 70px;
+            position: relative;
+            background: #080706;
+            overflow: hidden;
+        }
+
+        /* Ambient glow — top left */
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: -15%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(ellipse, rgba(212, 169, 106, 0.14) 0%, rgba(180, 140, 60, 0.05) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient glow — bottom right */
+        .stats-section::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 55vw;
+            height: 55vw;
+            background: radial-gradient(ellipse, rgba(184, 136, 45, 0.12) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .stats-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-title {
+            font-size: clamp(3.2rem, 5.5vw, 5.2rem);
+            line-height: 1.06;
+            margin-bottom: 48px;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+        }
+
+        .stats-title span {
+            color: var(--text-muted);
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        /* Glass card with gold border tint */
+        .stat-card {
+            padding: 36px;
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(255, 248, 235, 0.04) 0%, rgba(180, 140, 60, 0.02) 100%);
+            border: 1px solid rgba(212, 169, 106, 0.14);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.6s var(--ease-out-expo), box-shadow 0.6s ease, border-color 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top edge shimmer line */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold-light) 50%, transparent 100%);
+            opacity: 0.35;
+        }
+
+        /* Inner glow on hover */
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 0%, rgba(212, 169, 106, 0.08) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(180, 140, 60, 0.08);
+            border-color: rgba(212, 169, 106, 0.28);
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-number {
+            font-size: clamp(4.2rem, 7.5vw, 6.5rem);
+            margin-bottom: 10px;
+            line-height: 1;
+            letter-spacing: -0.04em;
+        }
+
+        .stat-desc {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+            max-width: 92%;
+        }
+
+        .stat-desc strong {
+            color: var(--text-main);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 1.2rem;
+            font-family: var(--font-heading);
+            letter-spacing: -0.01em;
+        }
+
+        .ig-proof {
+            width: 100%;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            display: block;
+            border: 1px solid rgba(212, 169, 106, 0.1);
+            aspect-ratio: 16 / 9;
+            position: relative;
+            margin-top: auto;
+        }
+
+        .ig-proof img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: bottom;
+            display: block;
+            opacity: 0.8;
+            transition: opacity 0.4s ease, transform 0.6s var(--ease-out-expo);
+        }
+
+        .stat-card:hover .ig-proof img {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+
+        .ig-proof-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(8, 7, 6, 0.85) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        /* CTA link with gold accent */
+        .trust-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold-light);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            padding: 13px 26px;
+            background: rgba(212, 169, 106, 0.07);
+            border-radius: 100px;
+            border: 1px solid rgba(212, 169, 106, 0.22);
+            transition: all 0.35s var(--ease-out-expo);
+            text-transform: uppercase;
+            align-self: flex-start;
+        }
+
+        .trust-link:hover {
+            background: var(--gold-light);
+            color: #0d0b08;
+            border-color: var(--gold-light);
+            transform: translateX(4px);
+            box-shadow: 0 8px 24px rgba(180, 140, 60, 0.25);
+        }
+
+        .trust-link svg {
+            transition: transform 0.3s ease;
+        }
+
+        .trust-link:hover svg {
+            transform: translateX(3px) translateY(-3px);
+        }
+
+        /* NDA badge style */
+        .nda-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            padding: 13px 26px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-transform: uppercase;
+            width: fit-content;
+            cursor: default;
+            user-select: none;
+            align-self: flex-start;
+        }
+
+        .nda-badge svg {
+            color: var(--gold-light);
+            opacity: 0.55;
+        }
+
+
+        /* ============================================================
+           BLOCK 2 — CASE NOBEL.LA
+           Warm espresso tones. Luxury interior atmosphere.
+        ============================================================ */
+        .case-section {
+            padding: 100px 0 40px 0;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0d0b08 0%, #100e0a 50%, #0d0b08 100%);
+            border-top: 1px solid rgba(212, 169, 106, 0.08);
+        }
+
+        /* Warm ambient light — top right */
+        .case-section::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            right: -10%;
+            width: 55vw;
+            height: 55vw;
+            background: radial-gradient(ellipse, rgba(220, 175, 90, 0.1) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Warm ambient light — bottom left */
+        .case-section::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -10%;
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(ellipse, rgba(184, 136, 45, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .case-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            grid-template-areas:
+                "header card"
+                "desc videos";
+            gap: 0 56px;
+            align-items: start;
+        }
+
+        .case-header {
+            grid-area: header;
+        }
+
+        .case-description-block {
+            grid-area: desc;
+        }
+
+        .video-showcase {
+            grid-area: videos;
+        }
+
+        .case-header h2 {
+            font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+            margin-bottom: 18px;
+            line-height: 1.18;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+        }
+
+        .case-description-block p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .case-description {
+            margin-top: 14px;
+            margin-bottom: 24px;
+        }
+
+        .case-desc-lead {
+            font-size: 1.05rem;
+            line-height: 1.65;
+            color: rgba(245, 240, 234, 0.92);
+            margin: 0 0 14px 0;
+        }
+
+        .case-desc-body {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin: 0 0 18px 0;
+        }
+
+        .case-desc-quote {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-warm);
+            border-left: 2px solid var(--gold-mid);
+            padding-left: 16px;
+            margin: 20px 0 0 0;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .case-desc-lead strong,
+        .case-desc-body strong {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .opt1-result-box {
+            display: flex;
+            gap: 32px;
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(212, 169, 106, 0.12);
+        }
+
+        .opt1-res-item h4 {
+            font-size: 2.4rem;
+            color: var(--gold-light);
+            margin-bottom: 5px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .opt1-res-item p {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        /* IG Profile Card — Instagram-style but warm */
+        .ig-profile-card {
+            grid-area: card;
+            background: rgba(20, 17, 12, 0.8);
+            border: 1px solid rgba(212, 169, 106, 0.16);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            max-width: 310px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(212, 169, 106, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .ig-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .ig-avatar-story-ring {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .ig-avatar-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #100e0a;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ig-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.48);
+        }
+
+        .ig-profile-stats {
+            display: flex;
+            flex: 1;
+            justify-content: space-around;
+        }
+
+        .ig-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        .ig-stat-count {
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .ig-stat-name {
+            font-size: 0.75rem;
+            color: #7a7268;
+            margin-top: 2px;
+        }
+
+        .ig-profile-bio {
+            color: var(--text-main);
+        }
+
+        .ig-profile-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 2px;
+        }
+
+        .ig-verified-badge {
+            width: 14px;
+            height: 14px;
+        }
+
+        .ig-profile-category {
+            color: #7a7268;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+
+        .ig-profile-text {
+            font-size: 0.78rem;
+            line-height: 1.3;
+            color: var(--text-muted);
+        }
+
+        /* Videos */
+        .video-showcase {
+            display: flex;
+            gap: 28px;
+            justify-content: center;
+            position: relative;
+            margin-top: 18px;
+        }
+
+        .video-item {
+            position: relative;
+            width: 270px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(212, 169, 106, 0.1);
+            border: 1px solid rgba(212, 169, 106, 0.12);
+            transition: transform 0.6s var(--ease-out-expo), box-shadow 0.6s ease;
+        }
+
+        .video-item:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 60px 100px rgba(0, 0, 0, 0.75), 0 0 40px rgba(180, 140, 60, 0.1);
+        }
+
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            aspect-ratio: 9/16;
+            display: block;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            background: rgba(8, 7, 6, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 9px 18px;
+            border-radius: 100px;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--gold-light);
+            border: 1px solid rgba(212, 169, 106, 0.28);
+            letter-spacing: 0.08em;
+        }
+
+        .case-video-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .case-video-container.secondary {
+            transform: translateY(-80px);
+        }
+
+        .reel-link {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .reel-link:hover {
+            color: var(--gold-light);
+        }
+
+        /* ============================================================
+           BLOCK 3 — SYSTEM
+           Cool charcoal. Systematic, data-driven. Grid & precision.
+        ============================================================ */
+        .system-section {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(180deg, #0a0908 0%, #0c0b09 50%, #0a0908 100%);
+            border-top: 1px solid rgba(212, 169, 106, 0.07);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Luxurious wide gold glow for contrast */
+        .system-section::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 50vh;
+            background: radial-gradient(ellipse, rgba(212, 169, 106, 0.09) 0%, rgba(180, 140, 60, 0.03) 50%, transparent 75%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .system-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .system-content {
+            max-width: 760px;
+            margin: 0 auto 50px auto;
+        }
+
+        .system-content h2 {
+            font-size: clamp(2.8rem, 4.8vw, 4.2rem);
+            margin-bottom: 20px;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .system-content p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            line-height: 1.75;
+        }
+
+        /* Marquee */
+        .marquee-option {
+            overflow: hidden;
+            position: relative;
+            padding: 12px 0;
+            margin-top: 28px;
+        }
+
+        .marquee-option::before,
+        .marquee-option::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 200px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .marquee-option::before {
+            left: 0;
+            background: linear-gradient(to right, #0a0908 0%, transparent 100%);
+        }
+
+        .marquee-option::after {
+            right: 0;
+            background: linear-gradient(to left, #0a0908 0%, transparent 100%);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 16px;
+            width: max-content;
+        }
+
+        .marquee-track.reverse {
+            margin-top: 16px;
+        }
+
+        .marquee-inner {
+            display: flex;
+            gap: 16px;
+            animation: scroll 40s linear infinite;
+            will-change: transform;
+        }
+
+        .marquee-track.reverse .marquee-inner {
+            animation: scroll-reverse 35s linear infinite;
+        }
+
+        .marquee-track:hover .marquee-inner {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(calc(-100% - 16px));
+            }
+        }
+
+        @keyframes scroll-reverse {
+            0% {
+                transform: translateX(calc(-100% - 16px));
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .marquee-item {
+            width: 210px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .screenshot-wrap {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 169, 106, 0.1);
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .screenshot-wrap:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 169, 106, 0.28);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .screenshot-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ============================================================
+           BLOCK 4 — PORTFOLIO NOTE
+           Editorial interlude. No decoration. Just text and air.
+        ============================================================ */
+        .portfolio-note-section {
+            padding: 80px 0;
+            background: var(--bg-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle bottom glow */
+        .portfolio-note-section::before {
+            content: '';
+            position: absolute;
+            bottom: -25%;
+            left: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(ellipse, rgba(180, 140, 60, 0.06) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .portfolio-note-inner {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0 56px;
+            align-items: start;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portfolio-note-aside {
+            padding-top: 4px;
+        }
+
+        .portfolio-note-aside-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-family: var(--font-heading);
+            font-weight: 500;
+            opacity: 0.45;
+        }
+
+        .portfolio-note-aside-rule {
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: rgba(212, 169, 106, 0.2);
+            margin-top: 14px;
+        }
+
+        .portfolio-note-content {
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            padding-left: 56px;
+            max-width: 600px;
+        }
+
+        .portfolio-note-title {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            margin-bottom: 16px;
+        }
+
+        .portfolio-note-body {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .portfolio-note-body p + p {
+            margin-top: 12px;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+        @media (max-width: 1100px) {
+            .container {
+                padding: 0 28px;
+            }
+
+            .case-grid {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "card"
+                    "text"
+                    "videos";
+                gap: 48px;
+            }
+
+            .ig-profile-card {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .portfolio-note-inner {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .portfolio-note-content {
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .video-showcase {
+                margin-top: 20px;
+            }
+
+            .stats-section {
+                padding: 60px 0;
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .stats-title {
+                margin-bottom: 48px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 32px;
+            }
+
+            .video-showcase {
+                flex-direction: column;
+                align-items: center;
+                gap: 28px;
+            }
+
+            .video-item {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .case-video-container {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .case-video-container.secondary {
+                transform: none;
+            }
+
+            .system-section,
+            .portfolio-note-section,
+            .case-section {
+                padding: 60px 0;
+            }
+
+            /* Case grid mobile: single column, card between header and description */
+            .case-grid {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "header"
+                    "card"
+                    "desc"
+                    "videos";
+                gap: 0;
+            }
+
+            .ig-profile-card {
+                max-width: 100%;
+                width: 100%;
+                margin-top: 20px;
+                margin-bottom: 24px;
+                border-radius: 14px;
+            }
+        }
+
+
+
+        /* ============================================================
+           LANGUAGE SWITCHER
+        ============================================================ */
+        .lang-switcher {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: rgba(8, 7, 6, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 169, 106, 0.22);
+            border-radius: 100px;
+            padding: 5px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 169, 106, 0.08);
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 7px 16px;
+            border-radius: 100px;
+            transition: all 0.3s var(--ease-out-expo);
+            position: relative;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--gold-mid) 0%, var(--gold-light) 100%);
+            color: #0d0b08;
+            box-shadow: 0 4px 14px rgba(180, 140, 60, 0.35);
+        }
+
+        .lang-btn:not(.active):hover {
+            color: var(--gold-light);
+        }
+
+        .lang-divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(212, 169, 106, 0.2);
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           FLOATING ACTION BUTTON
+        ============================================================ */
+        .fab-container {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .fab-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+            transform-origin: bottom right;
+            transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
+        }
+
+        .fab-container.active .fab-menu,
+        .fab-container:hover .fab-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(8, 7, 6, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 169, 106, 0.22);
+            padding: 12px 24px;
+            border-radius: 100px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 169, 106, 0.08);
+        }
+
+        .fab-item:hover {
+            background: rgba(212, 169, 106, 0.15);
+            border-color: rgba(212, 169, 106, 0.4);
+            color: var(--text-main);
+            transform: translateX(-6px);
+        }
+        
+        .fab-item svg {
+            color: var(--gold-light);
+            transition: transform 0.3s ease;
+        }
+
+        .fab-item:hover svg {
+            transform: scale(1.1);
+        }
+
+        .fab-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--gold-mid) 0%, var(--gold-light) 100%);
+            border: none;
+            padding: 16px 28px;
+            border-radius: 100px;
+            color: #0d0b08;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(180, 140, 60, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
+        }
+
+        .fab-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(180, 140, 60, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        }
+
+        .fab-icon {
+            transition: transform 0.4s var(--ease-out-expo);
+        }
+
+        .fab-container.active .fab-icon,
+        .fab-container:hover .fab-icon {
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .fab-container {
+                bottom: 24px;
+                right: 20px;
+            }
+            .fab-button {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
+            .fab-item {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LANGUAGE SWITCHER -->
+    <div class="lang-switcher" id="lang-switcher">
+        <button class="lang-btn active" id="btn-en" onclick="setLang('en')" aria-label="Switch to English">EN</button>
+        <div class="lang-divider"></div>
+        <button class="lang-btn" id="btn-ru" onclick="setLang('ru')" aria-label="Переключить на русский">RU</button>
+    </div>
+
+    <!-- BLOCK 1: RECORDS -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="eyebrow reveal" data-en="Portfolio · Video Editing" data-ru="Portfolio · Монтаж">Portfolio ·
+                Video Editing</div>
+            <h1 class="stats-title reveal">
+                <span data-en="Results speak" data-ru="Результаты говорят">Results speak</span><br><span
+                    data-en="louder than words." data-ru="громче слов.">louder than words.</span>
+            </h1>
+
+            <div class="stats-grid">
+                <!-- Record 1 -->
+                <div class="stat-card reveal reveal-delay-1">
+                    <div class="stat-number number text-gradient">9.3M</div>
+                    <div class="stat-desc">
+                        <strong data-en="Account record." data-ru="Рекорд аккаунта.">Account record.</strong>
+                        <span data-en="Working with a billionaire and multi-business owner."
+                            data-ru="Работа с миллиардером и владельцем нескольких бизнесов.">Working with a billionaire
+                            and multi-business owner.</span>
+                    </div>
+                    <div class="ig-proof">
+                        <img src="assets/9_3m.jpg" alt="9.3M views screenshot">
+                        <div class="ig-proof-overlay"></div>
+                    </div>
+                    <div class="nda-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span data-en="Restricted under NDA" data-ru="Скрыто по соглашению NDA">Restricted under
+                            NDA</span>
+                    </div>
+                </div>
+
+                <!-- Record 2 -->
+                <div class="stat-card reveal reveal-delay-2">
+                    <div class="stat-number number text-gradient">5.6M</div>
+                    <div class="stat-desc">
+                        <strong data-en="Breaking the ceiling." data-ru="Пробитие потолка.">Breaking the
+                            ceiling.</strong>
+                        <span data-en="Working with a leading luxury real estate agency from Los Angeles."
+                            data-ru="Работа с ведущим агентством элитной недвижимости из Лос-Анджелеса.">Working with a
+                            leading luxury real estate agency from Los Angeles.</span>
+                    </div>
+                    <div class="ig-proof">
+                        <img src="assets/5_6m.jpg" alt="5.6M views screenshot">
+                        <div class="ig-proof-overlay"></div>
+                    </div>
+                    <a href="https://www.instagram.com/nobel.la/reel/DPCFsXvCS61/" target="_blank"
+                        rel="noopener noreferrer" class="trust-link">
+                        <span data-en="Watch Reel on Instagram" data-ru="Смотреть Reel в Instagram">Watch Reel on
+                            Instagram</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7M17 7H7M17 7V17" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOCK 2: CASE NOBEL.LA -->
+    <section class="case-section">
+        <div class="container case-grid">
+            <div class="ig-profile-card reveal">
+                <div class="ig-profile-header">
+                    <div class="ig-avatar-story-ring">
+                        <div class="ig-avatar-container">
+                            <img src="assets/nobel_avatar.png" alt="nobel.la" class="ig-avatar">
+                        </div>
+                    </div>
+                    <div class="ig-profile-stats">
+                        <div class="ig-stat">
+                            <span class="ig-stat-count">446</span>
+                            <span class="ig-stat-name">posts</span>
+                        </div>
+                        <div class="ig-stat">
+                            <span class="ig-stat-count">229K</span>
+                            <span class="ig-stat-name">followers</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ig-profile-bio">
+                    <div class="ig-profile-name">
+                        nobel.la
+                        <svg class="ig-verified-badge" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 0L14.73 1.54L17.89 0.81L19.34 3.63L22.38 4.3L22.38 7.37L24.62 9.4L23.23 12.24L24.62 15.08L22.38 17.1L22.38 20.17L19.34 20.85L17.89 23.66L14.73 22.94L12 24.48L9.27 22.94L6.11 23.66L4.66 20.85L1.62 20.17L1.62 17.1L-0.62 15.08L0.77 12.24L-0.62 9.4L1.62 7.37L1.62 4.3L4.66 3.63L6.11 0.81L9.27 1.54L12 0Z"
+                                fill="#0095f6" />
+                            <path d="M10.5 17L5.5 12L7 10.5L10.5 14L17.5 7L19 8.5L10.5 17Z" fill="white" />
+                        </svg>
+                    </div>
+                    <div class="ig-profile-category">Interior Design Studio</div>
+                    <div class="ig-profile-text">
+                        Beverly Hills/NYC/Monaco/UAE
+                    </div>
+                </div>
+            </div>
+
+            <div class="case-header reveal">
+                <div class="eyebrow">Case Study · Nobel.la</div>
+                <h2 data-en="Editing for One of LA's Premier Interior Design Studios" data-ru="Монтаж для одной из ведущих студий дизайна интерьеров Лос-Анджелеса">Editing for One of LA's Premier Interior Design Studios</h2>
+            </div>
+
+            <div class="case-description-block reveal">
+                <div class="case-description">
+                    <p class="case-desc-lead">
+                        <strong>NOBÉL LA</strong> <span
+                            data-en="is a boutique interior design studio behind residences valued at"
+                            data-ru="— студия дизайна интерьеров, создающая резиденции стоимостью">is a boutique interior design studio behind residences valued at</span> <strong data-en="$20M–50M+" data-ru="$20–50 млн+">$20M–50M+</strong> <span
+                            data-en="across Beverly Hills, Monaco, and Dubai. I joined the content team as a Video Editor, working on the brand's flagship social content."
+                            data-ru="в Беверли-Хиллз, Монако и Дубае. Я присоединился к контент-команде как видеомонтажер и работал над ключевыми роликами бренда.">across Beverly Hills, Monaco, and Dubai. I joined the content team as a Video Editor, working on the brand's flagship social content.</span>
+                    </p>
+                    <p class="case-desc-body"
+                        data-en="Despite showcasing some of the world's most exclusive homes, the brand's content rarely exceeded one million views. Our team refined the visual presentation, helping shift performance into consistent multi-million-view territory. One of the reels I edited reached &lt;strong&gt;5.6M&lt;/strong&gt; organic views."
+                        data-ru="До нашего прихода контент редко преодолевал отметку в миллион просмотров. После обновления визуальной подачи аккаунт начал стабильно выходить на многомиллионные охваты. Один из смонтированных мной роликов набрал &lt;strong&gt;5,6 млн&lt;/strong&gt; органических просмотров.">
+                        Despite showcasing some of the world's most exclusive homes, the brand's content rarely exceeded one million views. Our team refined the visual presentation, helping shift performance into consistent multi-million-view territory. One of the reels I edited reached <strong>5.6M</strong> organic views.
+                    </p>
+                    <p class="case-desc-quote">
+                        <span data-en="Working with NOBÉL LA taught me one rule:"
+                            data-ru="Работа с NOBÉL LA научила меня простому правилу:">Working with NOBÉL LA taught me one rule:</span> <em
+                            data-en="Luxury editing should feel as expensive as the property itself."
+                            data-ru="люксовый монтаж должен ощущаться таким же дорогим, как и сам объект.">Luxury editing should feel as expensive as the property itself.</em>
+                    </p>
+                </div>
+            </div>
+
+            <div class="video-showcase reveal reveal-delay-2">
+                <div class="case-video-container">
+                    <div class="video-item">
+                        <div class="video-badge">5.6M VIEWS</div>
+                        <video src="assets/videos/nobel-5-6m.mp4" autoplay loop muted playsinline></video>
+                        <div class="video-controls" onclick="event.stopPropagation()">
+                            <button class="mute-btn" aria-label="Mute/Unmute">
+                                <svg class="icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <line x1="23" x2="17" y1="9" y2="15" />
+                                    <line x1="17" x2="23" y1="9" y2="15" />
+                                </svg>
+                                <svg class="icon-unmuted" style="display:none;" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                </svg>
+                            </button>
+                            <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5">
+                        </div>
+                    </div>
+                    <a href="https://www.instagram.com/nobel.la/reel/DPCFsXvCS61/" target="_blank"
+                        rel="noopener noreferrer" class="reel-link">
+                        Reel ↗
+                    </a>
+                </div>
+                <div class="case-video-container secondary">
+                    <div class="video-item">
+                        <div class="video-badge">450K VIEWS</div>
+                        <video src="assets/videos/nobel-450k.mp4" autoplay loop muted playsinline></video>
+                        <div class="video-controls" onclick="event.stopPropagation()">
+                            <button class="mute-btn" aria-label="Mute/Unmute">
+                                <svg class="icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <line x1="23" x2="17" y1="9" y2="15" />
+                                    <line x1="17" x2="23" y1="9" y2="15" />
+                                </svg>
+                                <svg class="icon-unmuted" style="display:none;" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                </svg>
+                            </button>
+                            <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5">
+                        </div>
+                    </div>
+                    <a href="https://www.instagram.com/nobel.la/reel/DOwADQ1EUJp/" target="_blank"
+                        rel="noopener noreferrer" class="reel-link">
+                        Reel ↗
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOCK 3: SYSTEM -->
+    <section class="system-section">
+        <div class="container">
+            <div class="system-content reveal">
+                <div class="eyebrow" data-en="Proof of System · 200K+" data-ru="Доказательство · 200K+">Proof of System
+                    · 200K+</div>
+                <h2><span data-en="This is not a coincidence." data-ru="Это не случайность.">This is not a
+                        coincidence.</span><br><span data-en="This is a system." data-ru="Это система.">This is a
+                        system.</span></h2>
+                <p data-en="20+ reels with 100K–400K+ organic views."
+                    data-ru="Более 20 роликов с 100K–400K+ органических просмотров.">
+                    20+ reels with 100K–400K+ organic views.</p>
+                <p style="margin-top: 1rem; opacity: 0.6; font-size: 0.85em;" data-en="*Client details are withheld under NDA." data-ru="*Данные клиентов не разглашаются в соответствии с NDA.">
+                    *Client details are withheld under NDA.
+                </p>
+            </div>
+
+            <div class="marquee-option reveal reveal-delay-1">
+                <div class="marquee-track" id="marquee-track-1">
+                    <!-- Items injected by JS -->
+                </div>
+                <div class="marquee-track reverse" id="marquee-track-2">
+                    <!-- Items injected by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOCK 4: PORTFOLIO NOTE -->
+    <section class="portfolio-note-section">
+        <div class="container">
+            <div class="portfolio-note-inner reveal">
+                <div class="portfolio-note-aside">
+                    <div class="portfolio-note-aside-label"
+                        data-en="Portfolio note"
+                        data-ru="О портфолио">Portfolio note</div>
+                    <span class="portfolio-note-aside-rule"></span>
+                </div>
+                <div class="portfolio-note-content">
+                    <div class="portfolio-note-title"
+                        data-en="Why this portfolio is intentionally small."
+                        data-ru="Почему это портфолио намеренно небольшое.">Why this portfolio is intentionally small.</div>
+                    <div class="portfolio-note-body">
+                        <p data-en="Most of my work is created for clients who value privacy as much as results."
+                            data-ru="Большинство моих работ создано для клиентов, которые ценят конфиденциальность не меньше, чем результат.">Most of my work is created for clients who value privacy as much as results.</p>
+                        <p data-en="Because of that, a significant portion of my portfolio cannot be published publicly."
+                            data-ru="Из-за этого значительная часть портфолио не может быть опубликована публично.">Because of that, a significant portion of my portfolio cannot be published publicly.</p>
+                        <p data-en="The projects shown on this website represent only the work I can responsibly share."
+                            data-ru="Проекты на этом сайте — только то, чем я могу делиться без ущерба для клиентов.">The projects shown on this website represent only the work I can responsibly share.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Language Switcher Script -->
+    <script>
+        function setLang(lang) {
+            document.documentElement.lang = lang;
+            localStorage.setItem('portfolio-lang', lang);
+
+            // Update button states
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+
+            // Swap all translatable elements
+            document.querySelectorAll('[data-en][data-ru]').forEach(el => {
+                const text = lang === 'en' ? el.dataset.en : el.dataset.ru;
+                // Check if the content contains HTML tags
+                if (text && (text.includes('<') || text.includes('&lt;'))) {
+                    el.innerHTML = text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                } else if (text) {
+                    el.textContent = text;
+                }
+            });
+        }
+
+        // Init on page load — default EN
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('portfolio-lang') || 'en';
+            setLang(saved);
+        });
+    </script>
+
+    <!-- Scripts for animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: stop observing once revealed
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Immediately reveal elements already in viewport on load
+            setTimeout(() => {
+                revealElements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        el.classList.add('active');
+                    }
+                });
+            }, 100);
+
+        });
+    </script>
+    <script>
+        const reelData = [
+            { img: 'assets/system-reels/1.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DaQTDKwtemr/' },
+            { img: 'assets/system-reels/2.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DZSfeQ7hHse/' },
+            { img: 'assets/system-reels/3.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DZP1vs-zmgx/' },
+            { img: 'assets/system-reels/4.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DZFWV5FzQS-/' },
+            { img: 'assets/system-reels/5.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DYpgASlszNq/' },
+            { img: 'assets/system-reels/6.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DYckROnM54L/' },
+            { img: 'assets/system-reels/7.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DYPnPrRspqY/' },
+            { img: 'assets/system-reels/8.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DYH1MjXs_LZ/' },
+            { img: 'assets/system-reels/9.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DXhLdgfDIYw/' },
+            { img: 'assets/system-reels/10.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DXZcb01DKqG/' },
+            { img: 'assets/system-reels/11.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DXMdT-FjDLi/' },
+            { img: 'assets/system-reels/12.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DXFCHypjHAI/' },
+            { img: 'assets/system-reels/13.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DW1Y5lJjEUw/' },
+            { img: 'assets/system-reels/14.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DWrLcFZjKlY/' },
+            { img: 'assets/system-reels/15.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DWbkW0OjBja/' },
+            { img: 'assets/system-reels/16.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DWZQG0ljPxg/' },
+            { img: 'assets/system-reels/17.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DWRb-DBDHcv/' },
+            { img: 'assets/system-reels/18.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DWJd9IhjHvJ/' },
+            { img: 'assets/system-reels/19.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DV6MrJ-Da4E/' },
+            { img: 'assets/system-reels/20.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DTAY02xjMLp/' },
+            { img: 'assets/system-reels/21.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DSaD0IZDPNN/' },
+            { img: 'assets/system-reels/22.jpg', link: 'https://www.instagram.com/teplitskiy.arkadiy/reel/DSNODdVDDBv/' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            function createItemContent(item) {
+                return `
+                    <div class="screenshot-wrap">
+                        <img src="${item.img}" alt="Reel views screenshot" loading="lazy">
+                    </div>
+                `;
+            }
+
+            const track1 = document.getElementById('marquee-track-1');
+            const track2 = document.getElementById('marquee-track-2');
+
+            if (track1 && track2) {
+                const mid = Math.ceil(reelData.length / 2);
+                const track1Data = reelData.slice(0, mid);
+                const track2Data = reelData.slice(mid);
+
+                const renderTrack = (container, data) => {
+                    let html = '';
+                    data.forEach(item => {
+                        html += `<div class="marquee-item">${createItemContent(item)}</div>`;
+                    });
+                    // Double it for seamless scrolling inside wrappers
+                    const inner = `<div class="marquee-inner">${html}</div>`;
+                    container.innerHTML = inner + inner;
+                };
+
+                renderTrack(track1, track1Data);
+                renderTrack(track2, track2Data);
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Force play all videos to bypass strict browser autoplay policies
+            const allVideos = document.querySelectorAll('video');
+
+            const attemptPlay = (video) => {
+                if (video.paused) {
+                    video.play().catch(e => console.log("Autoplay prevented:", e));
+                }
+            };
+
+            // Play on load
+            allVideos.forEach(attemptPlay);
+
+            // Play on intersection (when scrolled into view)
+            if ('IntersectionObserver' in window) {
+                const videoObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            attemptPlay(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                allVideos.forEach(v => videoObserver.observe(v));
+            }
+
+            // Fallback for user interaction
+            document.body.addEventListener('click', () => {
+                allVideos.forEach(attemptPlay);
+            }, { once: true });
+            document.body.addEventListener('touchstart', () => {
+                allVideos.forEach(attemptPlay);
+            }, { once: true });
+            document.body.addEventListener('mousemove', () => {
+                allVideos.forEach(attemptPlay);
+            }, { once: true });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoItems = document.querySelectorAll('.video-item');
+
+            videoItems.forEach(item => {
+                const video = item.querySelector('video');
+                const muteBtn = item.querySelector('.mute-btn');
+                const volumeSlider = item.querySelector('.volume-slider');
+                const iconMuted = item.querySelector('.icon-muted');
+                const iconUnmuted = item.querySelector('.icon-unmuted');
+
+                if (video && muteBtn && volumeSlider && iconMuted && iconUnmuted) {
+                    video.volume = volumeSlider.value;
+
+                    const updateMuteState = () => {
+                        if (video.muted || video.volume == 0) {
+                            iconMuted.style.display = 'block';
+                            iconUnmuted.style.display = 'none';
+                            volumeSlider.value = 0;
+                        } else {
+                            iconMuted.style.display = 'none';
+                            iconUnmuted.style.display = 'block';
+                            volumeSlider.value = video.volume;
+                        }
+                    };
+
+                    muteBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        video.muted = !video.muted;
+                        if (!video.muted && video.volume == 0) {
+                            video.volume = 0.5;
+                        }
+                        updateMuteState();
+                    });
+
+                    volumeSlider.addEventListener('input', (e) => {
+                        e.stopPropagation();
+                        const vol = parseFloat(e.target.value);
+                        video.volume = vol;
+                        if (vol > 0) {
+                            video.muted = false;
+                        } else {
+                            video.muted = true;
+                        }
+                        updateMuteState();
+                    });
+
+                    volumeSlider.addEventListener('click', (e) => e.stopPropagation());
+                }
+            });
+        });
+    </script>
+
+    <!-- FLOATING ACTION BUTTON -->
+    <div class="fab-container">
+        <div class="fab-menu">
+            <!-- PLACEHOLDER FOR TELEGRAM LINK (Update href below) -->
+            <a href="#" class="fab-item" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>Telegram</span>
+            </a>
+            <!-- PLACEHOLDER FOR INSTAGRAM LINK (Update href below) -->
+            <a href="#" class="fab-item" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                <span>Instagram</span>
+            </a>
+        </div>
+        <button class="fab-button" onclick="this.parentElement.classList.toggle('active')" aria-label="Contact">
+            <svg class="fab-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span class="fab-text" data-en="Discuss a Project" data-ru="Обсудить проект">Discuss a Project</span>
+        </button>
+    </div>
+</body>
+
+</html>
