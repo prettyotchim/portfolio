@@ -1213,7 +1213,8 @@
             pointer-events: none;
             transform: translateY(20px) scale(0.95);
             transform-origin: bottom right;
-            transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
+            transition: opacity 0.35s var(--ease-out-expo), transform 0.35s var(--ease-out-expo);
+            will-change: opacity, transform;
         }
 
         .fab-container.active .fab-menu {
@@ -1234,7 +1235,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(8, 7, 6, 0.72);
+            background: rgba(14, 12, 10, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(212, 169, 106, 0.22);
@@ -1244,8 +1245,11 @@
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 169, 106, 0.08);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .fab-item:hover {
@@ -1282,9 +1286,11 @@
             transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
         }
 
-        .fab-button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(180, 140, 60, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        @media (hover: hover) and (pointer: fine) {
+            .fab-button:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 32px rgba(180, 140, 60, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            }
         }
 
         .fab-icon {
@@ -1849,6 +1855,7 @@
                 fabButton.addEventListener('click', (e) => {
                     e.stopPropagation();
                     fabContainer.classList.toggle('active');
+                    fabButton.blur();
                 });
 
                 // On mouseleave, remove active class so PC hover doesn't freeze the menu open
