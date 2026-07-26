@@ -44,8 +44,27 @@
         /* ============================================================
            GLOBAL RESET & BASE
         ============================================================ */
-        * {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        a,
+        button,
+        input,
+        textarea,
+        select {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        *:focus,
+        *:focus-visible,
+        *:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
