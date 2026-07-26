@@ -12,6 +12,12 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800;900&display=swap"
         rel="stylesheet">
 
+    <!-- Preload Critical Above-The-Fold Images -->
+    <link rel="preload" as="image" href="assets/9_3m-mobile.webp" type="image/webp" media="(max-width: 768px)">
+    <link rel="preload" as="image" href="assets/9_3m.webp" type="image/webp" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="assets/5_6m-mobile.webp" type="image/webp" media="(max-width: 768px)">
+    <link rel="preload" as="image" href="assets/5_6m.webp" type="image/webp" media="(min-width: 769px)">
+
     <style>
         /* ============================================================
            BASE & DESIGN TOKENS
@@ -385,6 +391,7 @@
             aspect-ratio: 16 / 9;
             position: relative;
             margin-top: auto;
+            background: #080706;
         }
 
         .ig-proof img {
@@ -1356,7 +1363,15 @@
                             and multi-business owner.</span>
                     </div>
                     <div class="ig-proof">
-                        <img src="assets/9_3m.jpg" alt="9.3M views screenshot">
+                        <img src="assets/9_3m.webp" 
+                             srcset="assets/9_3m-mobile.webp 600w, assets/9_3m.webp 1010w" 
+                             sizes="(max-width: 768px) 90vw, 550px" 
+                             alt="9.3M views screenshot" 
+                             fetchpriority="high" 
+                             decoding="async" 
+                             width="1010" 
+                             height="1010" 
+                             loading="eager">
                         <div class="ig-proof-overlay"></div>
                     </div>
                     <div class="nda-badge">
@@ -1381,7 +1396,15 @@
                             leading luxury real estate agency from Los Angeles.</span>
                     </div>
                     <div class="ig-proof">
-                        <img src="assets/5_6m.jpg" alt="5.6M views screenshot">
+                        <img src="assets/5_6m.webp" 
+                             srcset="assets/5_6m-mobile.webp 600w, assets/5_6m.webp 1010w" 
+                             sizes="(max-width: 768px) 90vw, 550px" 
+                             alt="5.6M views screenshot" 
+                             fetchpriority="high" 
+                             decoding="async" 
+                             width="1010" 
+                             height="1010" 
+                             loading="eager">
                         <div class="ig-proof-overlay"></div>
                     </div>
                     <a href="https://www.instagram.com/nobel.la/reel/DPCFsXvCS61/" target="_blank"
@@ -1405,7 +1428,7 @@
                 <div class="ig-profile-header">
                     <div class="ig-avatar-story-ring">
                         <div class="ig-avatar-container">
-                            <img src="assets/nobel_avatar.png" alt="nobel.la" class="ig-avatar">
+                            <img src="assets/nobel_avatar.webp" alt="nobel.la" class="ig-avatar" width="440" height="440" loading="lazy" decoding="async">
                         </div>
                     </div>
                     <div class="ig-profile-stats">
