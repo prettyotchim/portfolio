@@ -858,6 +858,7 @@
             position: relative;
             padding: 12px 0;
             margin-top: 28px;
+            --marquee-gap: 16px;
         }
 
         .marquee-option::before,
@@ -883,17 +884,17 @@
 
         .marquee-track {
             display: flex;
-            gap: 16px;
+            gap: var(--marquee-gap);
             width: max-content;
         }
 
         .marquee-track.reverse {
-            margin-top: 16px;
+            margin-top: var(--marquee-gap);
         }
 
         .marquee-inner {
             display: flex;
-            gap: 16px;
+            gap: var(--marquee-gap);
             animation: scroll 40s linear infinite;
             will-change: transform;
         }
@@ -912,13 +913,13 @@
             }
 
             100% {
-                transform: translateX(calc(-100% - 16px));
+                transform: translateX(calc(-100% - var(--marquee-gap)));
             }
         }
 
         @keyframes scroll-reverse {
             0% {
-                transform: translateX(calc(-100% - 16px));
+                transform: translateX(calc(-100% - var(--marquee-gap)));
             }
 
             100% {
@@ -1140,6 +1141,19 @@
                 margin-top: 20px;
                 margin-bottom: 24px;
                 border-radius: 14px;
+            }
+
+            .marquee-option {
+                --marquee-gap: 10px;
+            }
+
+            .marquee-option::before,
+            .marquee-option::after {
+                width: 45px;
+            }
+
+            .marquee-item {
+                width: 140px;
             }
         }
 
