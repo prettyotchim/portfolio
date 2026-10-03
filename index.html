@@ -136,9 +136,22 @@ html[lang="ru"] .hero h1{font-size:54px}
 .ig-id:hover b{color:var(--brass-hi)}
 .nobel-grid{margin-top:56px;align-items:start}
 .reels{grid-column:1/8;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--col-gap)}
-.reel-frame{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.reel-frame{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#1d1915;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
 .reel-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(237,229,216,.1);pointer-events:none}
 .reel-frame video{width:100%;height:100%;object-fit:cover} /* source is 720x1280 = exact 9:16, nothing is cropped */
+/* fallback under the video: the poster, then a snapshot of the last shown frame. While the video is not
+   presenting frames (first load, resume after scrolling back, buffering) this layer shows instead of black,
+   softly blurring with a light sheen if the wait lasts more than a moment. */
+.reel-fb{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.reel-fb img,.reel-fb canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .45s ease,transform .45s ease}
+.reel-fb canvas{opacity:0}
+.reel-fb canvas.has-frame{opacity:1}
+.reel-fb::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s ease;background:linear-gradient(110deg,transparent 35%,rgba(237,229,216,.12) 50%,transparent 65%) 0 0/250% 100%}
+.reel-frame.has-fb video{position:relative;opacity:0;transition:opacity .35s ease}
+.reel-frame.has-fb.is-live video{opacity:1}
+.reel-frame.is-waiting .reel-fb img,.reel-frame.is-waiting .reel-fb canvas{filter:blur(10px) brightness(.82);transform:scale(1.07);transition-delay:.12s}
+.reel-frame.is-waiting .reel-fb::after{opacity:1;transition-delay:.12s;animation:sheen 1.6s linear infinite}
+@keyframes sheen{from{background-position:120% 0}to{background-position:-120% 0}}
 .sound-btn{position:absolute;right:12px;bottom:12px;z-index:2;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(16,14,11,.55);color:var(--bone)}
 .sound-btn:hover{background:rgba(16,14,11,.8)}
 .sound-btn svg{width:18px;height:18px}
@@ -658,11 +671,40 @@ html[lang="ru"] .chart{padding-left:68px}
 
   /* ---------- videos: play only while ≥40% visible; one sound at a time ---------- */
   var vids = document.querySelectorAll('video[data-autoplay]');
+  function fallbackLayer(v) {
+    var f = v.parentNode, fb = document.createElement('div');
+    fb.className = 'reel-fb'; fb.setAttribute('aria-hidden', 'true');
+    var img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = v.getAttribute('poster');
+    var cv = document.createElement('canvas'); cv.width = 540; cv.height = 960;
+    fb.appendChild(img); fb.appendChild(cv); f.insertBefore(fb, v);
+    v.removeAttribute('poster');                       /* the layer shows it instead, without the black gap */
+    f.classList.add('has-fb', 'is-waiting');
+    function snap() {                                   /* keep the frame the viewer last saw */
+      if (!f.classList.contains('is-live') || v.readyState < 2) return;
+      try { cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height); cv.classList.add('has-frame'); } catch (err) {}
+    }
+    function live() { f.classList.add('is-live'); f.classList.remove('is-waiting'); }
+    function hold() { f.classList.remove('is-live'); f.classList.add('is-waiting'); }
+    function onFirstFrame() {
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(live);
+      else { var t0 = v.currentTime, h = function () { if (v.currentTime !== t0) { v.removeEventListener('timeupdate', h); live(); } }; v.addEventListener('timeupdate', h); }
+    }
+    v.addEventListener('playing', onFirstFrame);
+    v.addEventListener('pause', snap);
+    v.addEventListener('waiting', function () { snap(); hold(); onFirstFrame(); });
+    v.addEventListener('emptied', hold);
+    v._resume = function () {
+      hold();                                           /* the snapshot underneath is the same frame, so nothing jumps */
+      if (v.preload === 'none') v.preload = 'auto';
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    };
+  }
   if (!reduce && 'IntersectionObserver' in window) {
+    vids.forEach(fallbackLayer);
     var vio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         var v = e.target;
-        if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        if (e.isIntersecting) v._resume();
         else v.pause();
       });
     }, { threshold: .4 });
